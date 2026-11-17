@@ -69,7 +69,40 @@ def main():
     if "第 0 步" not in body:
         fail("执行流程缺少第 0 步（开场硬闸门）")
 
+    # v2.2.0：深度模式的「小测验 + 疑点确认」必须靠打字，不许弹框
+    deep2 = slice_between(body, "### 深度-2", "### 深度-3")
+    if not deep2:
+        fail("缺少深度-2 小节（小测验 + 疑点确认）")
+    else:
+        if "禁止用 AskUserQuestion" not in deep2:
+            fail("深度-2 必须明确「禁止用 AskUserQuestion」（手打回答，不弹框）")
+        for tag in ("环节 A", "环节 B"):
+            if tag not in deep2:
+                fail(f"深度-2 缺少 {tag}")
+        if "用 **AskUserQuestion** 出" in deep2:
+            fail("深度-2 仍在用 AskUserQuestion 出选择题，应改为纯文字让用户打字")
+
+    # v2.2.0：总进度条必须彩色（emoji 色块）+ 标题级，且与子进度条分主次
+    for name, start, end in (
+        ("深度-0", "### 深度-0", "### 深度-1"),
+        ("深度-1", "### 深度-1", "### 深度-2"),
+    ):
+        sec = slice_between(body, start, end)
+        if "## 🟪" not in sec:
+            fail(f"{name} 的总进度条必须是「## + 彩色 emoji 色块」（如 ## 🟪🟦🟩🟨⬜...），不能退回单色 ▓░")
+    if "总进度" not in body or "子进度" not in body:
+        fail("必须同时存在「总进度」与「子进度」两级进度条描述")
+
     return report()
+
+
+def slice_between(text, start_marker, end_marker):
+    """取 start_marker 到 end_marker 之间的正文，找不到返回空串。"""
+    start = text.find(start_marker)
+    if start == -1:
+        return ""
+    end = text.find(end_marker, start + len(start_marker))
+    return text[start:end] if end != -1 else text[start:]
 
 
 def report():
