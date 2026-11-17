@@ -69,6 +69,17 @@ def main():
     if "第 0 步" not in body:
         fail("执行流程缺少第 0 步（开场硬闸门）")
 
+    # v2.3.0：开场必须两次弹框（档位 + 需求追问），不能只弹一次或只写文字
+    step0 = slice_between(body, "### 第 0 步", "### 第 1 步")
+    if not step0:
+        fail("缺少第 0 步小节正文")
+    else:
+        for tag in ("AskUserQuestion #1", "AskUserQuestion #2"):
+            if tag not in step0:
+                fail(f"第 0 步缺少「{tag}」——开场必须连续弹两次询问框")
+        if "自检" not in step0:
+            fail("第 0 步缺少弹框次数自检（0 次/1 次/2 次判断）")
+
     # v2.2.0：深度模式的「小测验 + 疑点确认」必须靠打字，不许弹框
     deep2 = slice_between(body, "### 深度-2", "### 深度-3")
     if not deep2:
