@@ -82,7 +82,7 @@ print_list() {
   echo "--------------  ------------------------  ------------------------"
   echo "claude          .claude/skills            ~/.claude/skills"
   echo "cursor          .cursor/skills            ~/.cursor/skills"
-  echo "agents          .agents/skills            ~/.agents/skills   （Codex / Gemini / Cursor 共享路径）"
+  echo "agents          .agents/skills            ~/.agents/skills   （Codex / Gemini / Cursor 共享路径，推荐只装这个）"
   echo "codex           .codex/skills             ~/.codex/skills"
   echo "gemini          .gemini/skills            ~/.gemini/skills"
   echo "copilot         .github/skills            ~/.copilot/skills"
@@ -105,8 +105,24 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$AGENTS" ]; then
-  AGENTS="claude,cursor,agents,codex,gemini,copilot,workbuddy"
+  # 默认装 agents 这个共享路径（Codex / Gemini / Cursor 都会读 .agents/skills），
+  # 不再同时装 codex、gemini，否则同一个技能会在它们的清单里出现两遍。
+  AGENTS="claude,cursor,agents,copilot,workbuddy"
 fi
+
+# 重叠检测：.agents/skills 是 Codex / Gemini / Cursor 的共享路径，
+# 同时指定 agents 和它们中的任何一个，会导致技能被列出两次。
+case ",${AGENTS}," in
+  *,agents,*)
+    for other in codex gemini; do
+      case ",${AGENTS}," in
+        *",${other},"*)
+          echo "⚠️  同时指定了 agents 和 ${other}：${other} 会读两处同名技能，清单里会出现两条 teach-me。建议只留 agents。" >&2
+          ;;
+      esac
+    done
+    ;;
+esac
 
 OLD_IFS=$IFS
 IFS=','

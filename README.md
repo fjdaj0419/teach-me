@@ -54,7 +54,7 @@
 git clone git@github.com:fjdaj0419/teach-me.git
 cd teach-me
 
-# 2. 装到当前项目下的所有工具目录（.claude / .cursor / .agents / .codex / .gemini / .github）
+# 2. 装到当前项目下的所有工具目录（.claude / .cursor / .agents / .github）
 ./scripts/install.sh
 
 # 3. 或者只装给某个工具，并且装成"全局可用"（对这台机器所有项目生效）
@@ -69,7 +69,7 @@ cd teach-me
 |---|---|
 | 无参数 | 装到**当前项目**下所有工具目录（只对这个仓库生效） |
 | `-g` / `--global` | 装到**用户主目录**（这台机器所有项目都能用） |
-| `-a` / `--agents LIST` | 指定工具，逗号分隔：`claude,cursor,agents,codex,gemini,copilot,workbuddy` |
+| `-a` / `--agents LIST` | 指定工具，逗号分隔：`claude,cursor,agents,codex,gemini,copilot,workbuddy`。**别把 `agents` 和 `codex`/`gemini` 写在同一条命令里**——会装两份，技能清单里出现两条同名条目 |
 | `-f` / `--force` | 目标已存在时覆盖（默认跳过，不碰已有文件） |
 | `-n` / `--dry-run` | 只打印要写入的位置，不实际复制 |
 | `-u` / `--uninstall` | 从目标目录卸载本技能 |
@@ -91,7 +91,8 @@ cd teach-me
 
 - **脚本只复制 `SKILL.md` 和 `README.md`**，不会碰 `.git`、`.github`、`scripts/`；目标目录里已有同名技能时默认**跳过**，要覆盖请显式加 `-f`。
 - **卸载有护栏**：只删「文件夹名恰好等于技能名」的目录，路径不符会拒绝执行。
-- **会自动降级，不会卡住**：本技能依赖 WorkBuddy 的 `show_widget`（内联画图）和 `AskUserQuestion`（弹框）。换到别的工具后，SKILL.md 里的「跨平台降级」章节会自动接管——图改成可运行的 SVG / HTML 代码块（或 Mermaid），弹框改成编号文字问题，流程不中断。
+- **会自动降级，不会卡住**：本技能依赖 WorkBuddy 的 `show_widget`（内联画图）和 `AskUserQuestion`（弹框）。开场第一步是**环境探测**（第 0 步 0.0）：有弹框工具就必须弹两次；没有就自动走 0.3 文字版——档位列成 ①②③、追问列成 B1/B2/B3，停等你打字。画图同理，改成可运行的 SVG / HTML 代码块（或 Mermaid）。流程不中断，追问环节一步不少。
+- **同一工具只装一处**：Codex / Gemini 既读自己的 `.codex/skills`、`.gemini/skills`，也读共享的 `.agents/skills`。两个都装会让技能在清单里重复出现（实测 Codex 会列两条 teach-me），只留一处即可。
 - **扩展字段被忽略**：`slug`、`displayName`、`summary`、`tags`、`disable-model-invocation` 是 WorkBuddy 侧的字段，标准里没有；其他工具会静默跳过，不报错，只是不生效（比如「不自动触发」这条在 Codex 里无效）。
 - 合规性已核对：`name: teach-me` 与目录同名、`description` 621 字符（上限 1024），符合 Agent Skills 规范。
 
@@ -101,7 +102,7 @@ cd teach-me
 
 ## 文件说明
 
-- `SKILL.md` —— 技能定义（YAML 头部 + 核心规则 + 三档流程 + h5 硬指标 + 排版规范），版本 v2.5.0。
+- `SKILL.md` —— 技能定义（YAML 头部 + 核心规则 + 三档流程 + h5 硬指标 + 排版规范），版本 v2.5.1。
 - `scripts/install.sh` —— 跨工具安装脚本：一条命令把技能装到 Claude Code / Cursor / Codex / Gemini CLI / Copilot / WorkBuddy 的 skills 目录，支持 dry-run、覆盖、卸载。
 - `scripts/validate_skill.py` —— 纯标准库校验脚本，检查 frontmatter、必填字段、版本号格式、关键章节是否齐全。
 - `.github/workflows/validate.yml` —— CI：每次 push / PR 到 main 自动跑一次校验。
