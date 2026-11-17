@@ -43,6 +43,58 @@
 
 如果你不想被追问、想直接开讲，加一句「别问了，直接讲」即可（档位选择框仍会弹出）。
 
+## 装到别的 AI 工具（跨工具使用）
+
+`SKILL.md` 是开放的 **Agent Skills** 标准格式，Claude Code、Cursor、Codex、Gemini CLI、GitHub Copilot 等几十个工具都读同一份文件——区别只在**放在哪个目录**。仓库里带了安装脚本，一条命令搞定。
+
+### 快速开始
+
+```bash
+# 1. 克隆仓库
+git clone git@github.com:fjdaj0419/teach-me.git
+cd teach-me
+
+# 2. 装到当前项目下的所有工具目录（.claude / .cursor / .agents / .codex / .gemini / .github）
+./scripts/install.sh
+
+# 3. 或者只装给某个工具，并且装成"全局可用"（对这台机器所有项目生效）
+./scripts/install.sh -g -a claude,cursor
+```
+
+装完在对应工具里用 `/teach-me`（Claude Code、Cursor）或 `$teach-me`（Codex）点名调用。
+
+### 全部参数
+
+| 参数 | 作用 |
+|---|---|
+| 无参数 | 装到**当前项目**下所有工具目录（只对这个仓库生效） |
+| `-g` / `--global` | 装到**用户主目录**（这台机器所有项目都能用） |
+| `-a` / `--agents LIST` | 指定工具，逗号分隔：`claude,cursor,agents,codex,gemini,copilot,workbuddy` |
+| `-f` / `--force` | 目标已存在时覆盖（默认跳过，不碰已有文件） |
+| `-n` / `--dry-run` | 只打印要写入的位置，不实际复制 |
+| `-u` / `--uninstall` | 从目标目录卸载本技能 |
+| `--list` | 打印各工具的路径对照表 |
+| `-h` / `--help` | 显示帮助 |
+
+### 各工具路径对照
+
+| 工具 | 项目级 | 用户级 | 调用方式 |
+|---|---|---|---|
+| WorkBuddy | —（仅用户级） | `~/.workbuddy/skills/` | `@skill:teach-me` |
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` | `/teach-me` |
+| Cursor | `.cursor/skills/` / `.agents/skills/` | `~/.cursor/skills/` / `~/.agents/skills/` | `/` 菜单选 |
+| Codex | `.codex/skills/` / `.agents/skills/` | `~/.codex/skills/` / `~/.agents/skills/` | `$teach-me` |
+| Gemini CLI | `.gemini/skills/` / `.agents/skills/` | `~/.gemini/skills/` / `~/.agents/skills/` | 模型自动识别 |
+| GitHub Copilot | `.github/skills/` | `~/.copilot/skills/` | `/` 菜单选 |
+
+### 几个实际使用注意
+
+- **脚本只复制 `SKILL.md` 和 `README.md`**，不会碰 `.git`、`.github`、`scripts/`；目标目录里已有同名技能时默认**跳过**，要覆盖请显式加 `-f`。
+- **卸载有护栏**：只删「文件夹名恰好等于技能名」的目录，路径不符会拒绝执行。
+- **行为会打折**：本技能的画图依赖 WorkBuddy 的 `show_widget`（8 处）、弹框依赖 `AskUserQuestion`（16 处）。在别的工具里格式照读、流程照走，但"内联彩色图 + h5 动画"会退化成输出 SVG / HTML 代码块，需要你手动保存打开。
+- **扩展字段被忽略**：`slug`、`displayName`、`summary`、`tags`、`disable-model-invocation` 是 WorkBuddy 侧的字段，标准里没有；其他工具会静默跳过，不报错，只是不生效（比如「不自动触发」这条在 Codex 里无效）。
+- 合规性已核对：`name: teach-me` 与目录同名、`description` 621 字符（上限 1024），符合 Agent Skills 规范。
+
 ## 适用学科
 
 数学、编程、物理、化学、生物、历史、经济、语言学……不限领域，只要是需要"从零讲懂"的知识点都适用。
@@ -50,6 +102,7 @@
 ## 文件说明
 
 - `SKILL.md` —— 技能定义（YAML 头部 + 核心规则 + 三档流程 + h5 硬指标 + 排版规范），版本 v2.4.0。
+- `scripts/install.sh` —— 跨工具安装脚本：一条命令把技能装到 Claude Code / Cursor / Codex / Gemini CLI / Copilot / WorkBuddy 的 skills 目录，支持 dry-run、覆盖、卸载。
 - `scripts/validate_skill.py` —— 纯标准库校验脚本，检查 frontmatter、必填字段、版本号格式、关键章节是否齐全。
 - `.github/workflows/validate.yml` —— CI：每次 push / PR 到 main 自动跑一次校验。
 

@@ -21,3 +21,11 @@ jobs:
 
       - name: Validate SKILL.md
         run: python3 scripts/validate_skill.py
+
+      - name: Check install.sh syntax
+        run: |
+          bash -n scripts/install.sh
+          echo "install.sh 语法检查通过"
+
+      - name: Dry-run install.sh
+        run: ./scripts/install.sh -n -a claude,cursor

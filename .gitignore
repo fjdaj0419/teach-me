@@ -13,3 +13,11 @@
 # 临时文件
 *.tmp
 *.log
+
+# 安装脚本在本仓库内试跑时生成的目录（避免误提交）
+.claude/skills/
+.cursor/skills/
+.agents/skills/
+.codex/skills/
+.gemini/skills/
+.github/skills/
