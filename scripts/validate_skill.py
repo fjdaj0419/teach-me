@@ -11,7 +11,11 @@ REQUIRED_KEYS = [
     "slug", "displayName", "name", "version", "summary",
     "license", "description", "disable-model-invocation",
 ]
-REQUIRED_SECTIONS = ["## 定位", "## 核心规则", "## 执行流程", "## 风格约束", "## 不适合的场景"]
+REQUIRED_SECTIONS = [
+    "## 定位", "## 核心规则", "## 执行流程",
+    "## 轻度模式流程", "## 深度模式流程",   # 三档模式（v2.0.0+）
+    "## 风格约束", "## 不适合的场景",
+]
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
 errors = []
