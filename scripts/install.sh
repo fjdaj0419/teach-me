@@ -181,6 +181,13 @@ for agent in "$@"; do
     continue
   fi
 
+  # 源目录 == 目标目录（例如仓库就放在 ~/.workbuddy/skills/teach-me 里）
+  if [ -d "$target" ] && [ "$target" -ef "$SRC_DIR" ]; then
+    echo "  - ${agent}：就是当前目录，无需安装 → $target"
+    SKIPPED=$((SKIPPED + 1))
+    continue
+  fi
+
   # 安装
   if [ -d "$target" ] && [ "$FORCE" -eq 0 ]; then
     echo "  - ${agent}：已存在，跳过（要覆盖加 -f）→ $target"
