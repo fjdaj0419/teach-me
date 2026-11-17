@@ -91,7 +91,7 @@ cd teach-me
 
 - **脚本只复制 `SKILL.md` 和 `README.md`**，不会碰 `.git`、`.github`、`scripts/`；目标目录里已有同名技能时默认**跳过**，要覆盖请显式加 `-f`。
 - **卸载有护栏**：只删「文件夹名恰好等于技能名」的目录，路径不符会拒绝执行。
-- **行为会打折**：本技能的画图依赖 WorkBuddy 的 `show_widget`（8 处）、弹框依赖 `AskUserQuestion`（16 处）。在别的工具里格式照读、流程照走，但"内联彩色图 + h5 动画"会退化成输出 SVG / HTML 代码块，需要你手动保存打开。
+- **会自动降级，不会卡住**：本技能依赖 WorkBuddy 的 `show_widget`（内联画图）和 `AskUserQuestion`（弹框）。换到别的工具后，SKILL.md 里的「跨平台降级」章节会自动接管——图改成可运行的 SVG / HTML 代码块（或 Mermaid），弹框改成编号文字问题，流程不中断。
 - **扩展字段被忽略**：`slug`、`displayName`、`summary`、`tags`、`disable-model-invocation` 是 WorkBuddy 侧的字段，标准里没有；其他工具会静默跳过，不报错，只是不生效（比如「不自动触发」这条在 Codex 里无效）。
 - 合规性已核对：`name: teach-me` 与目录同名、`description` 621 字符（上限 1024），符合 Agent Skills 规范。
 
@@ -101,7 +101,7 @@ cd teach-me
 
 ## 文件说明
 
-- `SKILL.md` —— 技能定义（YAML 头部 + 核心规则 + 三档流程 + h5 硬指标 + 排版规范），版本 v2.4.0。
+- `SKILL.md` —— 技能定义（YAML 头部 + 核心规则 + 三档流程 + h5 硬指标 + 排版规范），版本 v2.5.0。
 - `scripts/install.sh` —— 跨工具安装脚本：一条命令把技能装到 Claude Code / Cursor / Codex / Gemini CLI / Copilot / WorkBuddy 的 skills 目录，支持 dry-run、覆盖、卸载。
 - `scripts/validate_skill.py` —— 纯标准库校验脚本，检查 frontmatter、必填字段、版本号格式、关键章节是否齐全。
 - `.github/workflows/validate.yml` —— CI：每次 push / PR 到 main 自动跑一次校验。
